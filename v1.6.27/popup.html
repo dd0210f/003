@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+#instLabel{font-size:12px;color:#fbbf24;margin-left:8px;font-weight:700}
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:460px;max-height:640px;overflow-y:auto;font:12px/1.5 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;background:#0f1420;color:#dbe2f0;padding:12px}
+h1{font-size:14px;margin-bottom:8px}
+h1 .ver{font-size:10px;color:#8b93a7;font-weight:normal;margin-left:6px}
+.tabs{display:flex;gap:6px;margin-bottom:10px}
+.tab{flex:1;text-align:center;padding:8px;border-radius:8px;background:#1a2233;cursor:pointer;border:1px solid #2a3550}
+.tab b{display:block;font-size:13px}
+.tab small{color:#8b93a7}
+.tab.active{border-color:#3b82f6;background:#16294d}
+.sec{background:#141b2c;border:1px solid #232e47;border-radius:8px;padding:10px;margin-bottom:10px}
+.sec h2{font-size:12px;color:#8b93a7;margin-bottom:8px;font-weight:600}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.field label{display:block;font-size:11px;color:#8b93a7;margin-bottom:2px}
+.field input{width:100%;background:#0f1420;border:1px solid #2a3550;color:#dbe2f0;border-radius:6px;padding:6px;font-size:12px}
+.assets{display:flex;flex-wrap:wrap;gap:8px}
+.asset{display:flex;align-items:center;gap:4px;background:#0f1420;border:1px solid #2a3550;border-radius:6px;padding:5px 8px;cursor:pointer}
+.row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.row:last-child{margin-bottom:0}
+button{background:#2563eb;color:#fff;border:0;border-radius:6px;padding:8px 12px;font-size:12px;cursor:pointer}
+button:disabled{opacity:.4;cursor:default}
+button.warn{background:#b45309}button.danger{background:#b91c1c}button.ghost{background:#1a2233;border:1px solid #2a3550}
+button.big{flex:1;padding:10px;font-size:13px}
+.status{font-size:12px}
+.status.on{color:#34d399}.status.off{color:#f87171}
+.live-lock{display:inline-block;padding:2px 10px;border-radius:10px;font-size:11px;font-weight:700}
+.live-lock.paper{background:#064e3b;color:#34d399}.live-lock.live{background:#7f1d1d;color:#fca5a5}
+table{width:100%;border-collapse:collapse;font-size:11px}
+th{color:#8b93a7;text-align:left;padding:4px;font-weight:600}
+td{padding:4px;border-top:1px solid #1e2740}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+.st{font-weight:700}
+.st.monitoring{color:#8b93a7}.st.warming{color:#fbbf24}.st.no_signal{color:#64748b}
+.st.paper_open{color:#fbbf24}.st.live_open{color:#34d399}.st.in_position{color:#60a5fa}
+.st.error,.st.order_fail,.st.rejected,.st.size_fail{color:#f87171}
+.st.cooldown{color:#a78bfa}.st.resolve_fail,.st.no_mark{color:#f87171}
+.st.maker_wait,.st.maker_pending{color:#a78bfa}.st.maker_timeout,.st.maker_vol_skip{color:#fb923c}.st.no_quote{color:#f87171}
+.st.position_limit,.st.loss_circuit,.st.trade_limit,.st.daily_loss_limit{color:#fb923c}
+.stats{display:flex;gap:12px;flex-wrap:wrap;font-size:12px}
+.stats b{font-size:14px}
+.pos{color:#34d399}.neg{color:#f87171}
+#logs{max-height:150px;overflow-y:auto}
+.log{padding:3px 0;border-bottom:1px solid #1a2233;font-size:11px}
+.log .t{color:#64748b;margin-right:6px}.log .a{color:#93c5fd;margin-right:6px;font-weight:700}
+.log.ok{color:#34d399}.log.err{color:#f87171}.log.warn{color:#fbbf24}.log.muted{color:#94a3b8}
+.footer{display:flex;justify-content:space-between;align-items:center;color:#64748b;font-size:11px;margin-top:4px}
+.footer button{padding:4px 8px;font-size:11px}
+.hint{font-size:11px;color:#8b93a7}
+select{width:100%;background:#0f1420;border:1px solid #2a3550;color:#dbe2f0;border-radius:6px;padding:6px;font-size:12px}
+.badge{display:inline-block;padding:1px 8px;border-radius:10px;font-size:10px;font-weight:700;margin-left:6px}
+.badge.ok{background:#064e3b;color:#34d399}.badge.warn{background:#78350f;color:#fbbf24}
+.badge.mut{background:#1e2740;color:#8b93a7}.badge.err{background:#7f1d1d;color:#fca5a5}
+.vrow{padding:4px 0;border-bottom:1px solid #1a2233;font-size:11px}
+.vrow:last-child{border-bottom:0}
+.switch{position:relative;width:40px;height:22px;background:#2a3550;border-radius:11px;cursor:pointer;flex:none}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#8b93a7;transition:all .15s}
+.switch.on{background:#7f1d1d}.switch.on::after{left:21px;background:#fca5a5}
+</style>
+</head>
+<body>
+<h1>六六自动交易<span id="instLabel"></span><span class="ver" id="ver"></span></h1>
+
+<div class="sec" id="venueSec">
+  <h2>交易所</h2>
+  <div class="row">
+    <div class="field" style="flex:1"><label>当前交易所</label><select id="venueSelect"></select></div>
+  </div>
+  <div id="venueList" style="margin-bottom:8px"></div>
+  <div class="row"><span class="hint">切换持仓策略：</span></div>
+  <div class="row">
+    <label class="asset"><input type="radio" name="vpol" value="keep"> 留着不管</label>
+    <label class="asset"><input type="radio" name="vpol" value="close"> 自动平仓</label>
+    <label class="asset"><input type="radio" name="vpol" value="remind"> 只提醒</label>
+  </div>
+  <div class="hint" style="margin-bottom:8px">留着不管=旧所持仓不动；自动平仓=切换前平掉旧所全部持仓；只提醒=提示手动处理（默认）。</div>
+  <div id="credForm"></div>
+</div>
+
+<div class="tabs">
+  <div class="tab" data-mode="profit"><b>Profit</b><small>趋势剥头皮 · TP大</small></div>
+  <div class="tab" data-mode="volume"><b>Volume</b><small>高频剥头皮 · 快进快出</small></div>
+  <div class="tab" data-mode="maker"><b>Maker</b><small>挂单刷量 · 低磨损</small></div>
+  <div class="tab" data-mode="hedge"><b>Hedge</b><small>对冲 · RSI</small></div>
+  <div class="tab" data-mode="fund"><b>Fund</b><small>单所费率套利</small></div>
+  <div class="tab" data-mode="xfund"><b>XFund</b><small>跨所费率套利</small></div>
+</div>
+
+<div class="sec">
+  <h2>账户与风控</h2>
+  <div class="row" style="margin-bottom:8px"><div class="field" style="flex:1"><label>本机备注名(多开区分,如账号尾号)</label><input id="label" type="text" placeholder="例如:尾号1234"></div></div>
+  <div class="grid">
+    <div class="field"><label>权益 USDC</label><input id="equity" type="number" min="1"></div>
+    <div class="field"><label>保证金比例 %</label><input id="marginPct" type="number" min="1" max="100"></div>
+    <div class="field"><label>目标杠杆</label><input id="targetLev" type="number" min="1" max="20"></div>
+    <div class="field"><label>日亏损熔断 %</label><input id="dailyLossPct" type="number" min="1"></div>
+    <div class="field"><label>最大持仓数</label><input id="maxPositions" type="number" min="1"></div>
+    <div class="field"><label>连续亏损熔断</label><input id="maxLosses" type="number" min="1"></div>
+    <div class="field"><label>每日最大开仓</label><input id="maxTrades" type="number" min="1"></div>
+    <div class="field"><label>Profit 滑点</label><input id="profitSlippage" type="number" step="0.0005"></div>
+    <div class="field"><label>Volume 滑点</label><input id="volumeSlippage" type="number" step="0.0005"></div>
+    <div class="field"><label>熵否决阈值(0-1)</label><input id="entropyThreshold" type="number" step="0.05" min="0" max="1"></div>
+    <div class="field"><label>熵窗口(价格点数)</label><input id="entropyWindow" type="number" min="12"></div>
+    <div class="field"><label>UKOIL 真实代号(留空自动)</label><input id="ukoilUnderlying" type="text" placeholder="如 BRENTS"></div>
+    <div class="field"><label>各标的真实代号(留空自动)</label><input id="manualUnderlyings" type="text" placeholder="如 XAU=XAUS,US100=US100S"></div>
+    <div class="field"><label>初始资金 USDC(手动填)</label><input id="initialFunds" type="number" min="0" step="1"></div>
+    <div class="field"><label>历史收益补录 U(旧版收益手动填一次)</label><input id="lifetimeSeed" type="number" step="0.01"></div>
+  </div>
+  <div class="row" style="margin-top:6px"><label class="asset"><input type="checkbox" id="entropyFilter"> 熵否决（高熵=随机游走时跳过开仓，只否决不产生信号）</label></div>
+</div>
+
+<div class="sec" id="makerSec" style="display:none">
+  <h2>Maker 刷量参数（限价挂单，不吃 spread）</h2>
+  <div class="row" style="margin-bottom:8px"><span class="hint">标的：</span><div class="assets" id="makerAssets"></div></div>
+  <div class="grid" id="makerSizeGrid"></div>
+  <div class="hint" style="margin:6px 0">BTC/ETH 按基础币数量；TradFi 标的按每笔 USDC 名义（qty=名义÷市价），休市时自动跳过。</div>
+  <div class="grid">
+    <div class="field"><label>下单间隔最小(秒)</label><input id="makerMinDelay" type="number" min="5"></div>
+    <div class="field"><label>下单间隔最大(秒)</label><input id="makerMaxDelay" type="number" min="5"></div>
+    <div class="field"><label>挂单偏移(bp)</label><input id="makerPriceOffsetBp" type="number" step="0.1" min="0"></div>
+    <div class="field"><label>等成交超时(秒)</label><input id="makerMonitorSecs" type="number" min="10"></div>
+    <div class="field"><label>最长持仓(秒)</label><input id="makerMaxHoldSecs" type="number" min="10"></div>
+    <div class="field"><label>止盈 %(相对名义)</label><input id="makerTpPct" type="number" step="0.5"></div>
+    <div class="field"><label>止损 %(相对名义)</label><input id="makerSlPct" type="number" step="0.5"></div>
+    <div class="field"><label>1m波动过滤 %(超则跳过)</label><input id="makerMaxVolPct" type="number" step="0.05"></div>
+    <div class="field"><label>平仓滑点</label><input id="makerSlippage" type="number" step="0.0005"></div>
+  </div>
+  <div class="row" style="margin-top:8px">
+    <label class="asset"><input type="checkbox" id="makerAlternate"> 多空交替（不勾选=随机方向）</label>
+  </div>
+  <div class="hint" style="margin-top:6px">开仓挂限价单（买 bid-偏移 / 卖 ask+偏移）；超时未成交自动撤单；成交后按止盈/止损/最长持仓市价平仓。PAPER 模式假设限价单立即成交。</div>
+</div>
+
+<div class="sec" id="hedgeSec" style="display:none">
+  <h2>Hedge 对冲参数（对子通用，各所可配）</h2>
+  <div class="hint">信号：A腿 5 分钟 RSI(12)，&lt;45 做多、&gt;55 做空，45~55 不开仓；每根 5m K线只发一次信号。</div>
+  <div class="hint">对冲：A腿成交后开等额反向 B腿（IOC 吃单）；止盈每腿 ±0.8%（reduce-only 挂单）；任一腿 -15% 或双腿异常则全平。</div>
+  <div class="hint">仓位：每腿名义 ≈ 权益 ×5；两腿杠杆需与交易所预设一致（Arcus 可 API 校验，不一致拒绝启动）。</div>
+  <div class="hint">风控：价差 &gt;10bps 不开仓；日内累计亏损达 50U 当天停止。默认 PAPER（只看信号不下单）。</div>
+  <div class="field" style="margin-top:8px"><label>A腿代号(信号腿,留空=所默认)</label><input id="hedgeSymA" placeholder="如 BTC-USD"></div>
+  <div class="field"><label>B腿代号(对冲腿,留空=所默认)</label><input id="hedgeSymB" placeholder="如 ETH-USD"></div>
+  <div class="field"><label>A腿杠杆(0=所默认)</label><input id="hedgeLevA" inputmode="numeric" placeholder="0"></div>
+  <div class="field"><label>B腿杠杆(0=所默认)</label><input id="hedgeLevB" inputmode="numeric" placeholder="0"></div>
+  <div class="hint" style="margin-top:6px">各所默认对子：Arcus=BTC-USD/ETH-USD(40x/25x)；Variational=BTC/ETH(10x/10x，K线由插件运行积累，首次约需4.5小时)；QFEX=GOLD-USD/SILVER-USD(10x/10x)。Variational 杠杆请在网页端预设，API 无法校验。</div>
+</div>
+
+<div class="sec" id="fundSec" style="display:none">
+  <h2>Fund 单所费率套利（固定策略）</h2>
+  <div class="hint">逻辑：同一所内两个市场的年化费率差。做多低费率腿、做空高费率腿，edge = 高 − 低。</div>
+  <div id="fundPairs"></div>
+  <div class="hint">开仓线年化 15%，平仓线 5%；每腿名义 $500，市价双腿同开；基差超 50bps 或 edge 跌破平仓线则两腿全平。</div>
+  <div class="hint">任一腿费率取不到 → 跳过不清仓（防 API 毛刺误平）。默认 PAPER（只看信号不下单）。</div>
+</div>
+
+<div class="sec" id="xfundSec" style="display:none">
+  <h2>XFund 跨所费率套利（固定策略）</h2>
+  <div class="hint">逻辑：同一标的在两所的年化费率差。做多低费率所、做空高费率所，edge = 高 − 低。</div>
+  <div class="hint">默认：Variational × Lighter 的 BTC；开仓线年化 10%，平仓线 3%。</div>
+  <div class="hint">每腿名义 $500，先开 long 腿再开 short 腿；第二腿失败立即平掉第一腿（绝不留裸腿）。</div>
+  <div class="hint">基差超 80bps 或 edge 跌破平仓线则两所各平各的；任一所持仓读失败 → 保持不清仓。</div>
+  <div class="hint">默认 PAPER（只看信号不下单）。LIVE 前两所凭证都要配好（Lighter 需官网 API Key）。</div>
+  <div class="hint">三所重叠标的：US100↔US100-USD↔QQQ-USD；US500↔US500-USD↔SPY-USD；BTC/ETH 只有 Variational×Arcus（QFEX 无加密永续）；QFEX↔Arcus 同名：NVDA/AAPL/SNDK-USD。</div>
+</div>
+
+<div class="sec">
+  <h2>标的</h2>
+  <div class="assets" id="assets"></div>
+  <div class="hint" style="margin-top:6px">XAU→XAUS 等别名自动解析;TradFi 标的休市时询价失败自动跳过,不开仓</div>
+</div>
+
+<div class="sec">
+  <h2>执行模式</h2>
+  <div class="row">
+    <div class="switch" id="liveSwitch"></div>
+    <span class="live-lock paper" id="liveMode">PAPER</span>
+    <span class="hint">PAPER 只模拟,不发送真实订单</span>
+  </div>
+  <div class="row">
+    <button class="ghost" id="testBtn" title="仅诊断,不影响运行">测试连接</button>
+    <button class="ghost" id="probeBtn" title="只询价不下单,定位询价 400 这类问题">询价探测</button>
+    <span class="status on" id="sessStatus">策略常开｜异常自动恢复</span>
+  </div>
+  <div class="row">
+    <button class="big" id="startBtn">▶ 启动</button>
+    <button class="big ghost" id="stopBtn" disabled>⏹ 停止</button>
+    <button class="warn" id="restartBtn" title="中断当前轮次并重建连接">↻ 重启策略</button>
+    <button class="danger" id="panicBtn">紧急停止</button>
+  </div>
+  <div class="hint" id="runState">已停止</div>
+</div>
+
+<div class="sec">
+  <h2>市场状态</h2>
+  <table><thead><tr><th>标的</th><th style="text-align:right">价格</th><th style="text-align:right">价差bps</th><th style="text-align:right">1m</th><th style="text-align:right">5m</th><th>状态</th></tr></thead>
+  <tbody id="mktBody"></tbody></table>
+</div>
+
+<div class="sec">
+  <h2>今日统计</h2>
+  <div class="stats">
+    <span>PnL <b id="sPnl">0.00</b></span>
+    <span>开仓 <b id="sTrades">0</b></span>
+    <span>胜 <b id="sWins" class="pos">0</b> / 负 <b id="sLosses" class="neg">0</b></span>
+    <span>成交额 <b id="sTurn">0</b>U</span>
+  </div>
+  <div class="stats" style="margin-top:4px">
+    <span>当前模式 <b id="mMode">-</b> (自<b id="mSince">-</b>起)</span>
+    <span>PnL <b id="mPnl">0.00</b></span>
+    <span>开仓 <b id="mTrades">0</b></span>
+    <span>胜 <b id="mWins" class="pos">0</b> / 负 <b id="mLosses" class="neg">0</b></span>
+  </div>
+  <div class="stats" style="margin-top:4px">
+    <span>初始资金 <b id="lFunds">0</b>U</span>
+    <span>累计已实现 <b id="lPnl">+0.00U</b></span>
+    <span>开仓 <b id="lTrades">0</b> (自<b id="lSince">-</b>)</span>
+    <span>估算净值 <b id="lEquity">0</b>U</span>
+    <span id="balRow" style="display:none">QFEX 余额 <b id="lBal">-</b></span>
+  </div>
+  <div class="hint" style="margin-top:2px">累计跨天不清零；不含未实现盈亏/资金费率/手续费；<span id="balHint">余额接口未确认前净值为估算</span></div>
+</div>
+
+<div class="sec">
+  <h2>日志</h2>
+  <div id="logs"></div>
+</div>
+
+<div class="sec">
+  <h2>看门狗</h2>
+  <div class="row">
+    <label class="asset"><input type="checkbox" id="wdEnabled"> 看门狗（出错自动通知 Muse 修）</label>
+  </div>
+  <div class="hint">零配置。出错自动上报，Muse 每 5 分钟检查一次；插件掉线（心跳断了）Muse 会在主聊天喊你回来处理（不发邮件）。</div>
+  <div class="row" style="margin-top:6px"><div class="field" style="flex:1"><label>Gist ID（看门狗 GitHub 中继）</label><input id="wdGistId" type="text" placeholder="secret gist 地址栏里的 ID"></div></div>
+  <div class="row"><div class="field" style="flex:1"><label>GitHub PAT（仅 gist 权限）</label><input id="wdGhPat" type="password" placeholder="ghp_…"></div></div>
+  <div class="hint">PAT 仅存本机，不会上传；去 gist.github.com 建 secret gist（文件名 watchdog.json，内容 {"events":[]}），把地址栏的 ID 填进来。</div>
+  <div class="row"><button class="ghost" id="wdTestBtn">发送测试报警</button></div>
+</div>
+
+<div class="footer">
+  <span id="footVer"></span>
+  <button class="ghost" id="copyReport">复制错误报告</button>
+</div>
+
+<script src="venues/registry.js"></script>
+<script src="popup.js"></script>
+</body>
+</html>

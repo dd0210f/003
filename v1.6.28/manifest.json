@@ -1,0 +1,41 @@
+{
+  "action": {
+    "default_icon": {
+      "128": "icons/icon128.png",
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png"
+    },
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "description": "六所自动交易:Variational / Lighter / QFEX / Entropy(Hyperliquid HIP-3)可切换,Arcus waitlist,TxFlow 不支持。Profit / Volume / Maker 三模式,Variational 走浏览器登录态,无 API Key。默认 PAPER 模拟,LIVE 需二次确认。",
+  "host_permissions": [
+    "https://omni.variational.io/*",
+    "https://webhook.site/*",
+    "https://api.github.com/*",
+    "https://trade.qfex.com/*",
+    "https://mds.qfex.com/*",
+    "https://trade.qfex.io/*",
+    "https://mds.qfex.io/*",
+    "https://mainnet.zklighter.elliot.ai/*",
+    "https://testnet.zklighter.elliot.ai/*",
+    "https://api.hyperliquid.xyz/*",
+    "https://api.hyperliquid-testnet.xyz/*",
+    "https://api.qfex.com/*",
+    "https://api.qfex.io/*"
+  ],
+  "icons": {
+    "128": "icons/icon128.png",
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png"
+  },
+  "manifest_version": 3,
+  "name": "六六自动交易",
+  "permissions": [
+    "storage",
+    "alarms"
+  ],
+  "version": "1.6.28"
+}
